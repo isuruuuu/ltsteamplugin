@@ -6274,7 +6274,7 @@
       // Update Add via LuaTools button
       const luatoolsBtn = document.querySelector(".luatools-button");
       if (luatoolsBtn) {
-        const addViaText = lt("Add via LuaTools");
+        const addViaText = lt("Add");
         luatoolsBtn.title = addViaText;
         luatoolsBtn.setAttribute("data-tooltip-text", addViaText);
         const span = luatoolsBtn.querySelector("span");
@@ -6387,63 +6387,63 @@
       const steamdbContainer = targetContainer;
 
       // Insert a Restart Steam button between Community Hub and our LuaTools button
-      try {
-        if (
-          !document.querySelector(".luatools-restart-button") &&
-          !window.__LuaToolsRestartInserted
-        ) {
-          ensureStyles();
-          // In Big Picture mode, use queue button as reference; otherwise use first link in container
-          const referenceBtn = isBigPicture
-            ? document.querySelector("#queueBtnFollow")
-            : steamdbContainer.querySelector("a");
-
-          // Use same custom button for both modes
-          const restartBtn = document.createElement("a");
-          if (referenceBtn && referenceBtn.className) {
-            restartBtn.className =
-              referenceBtn.className + " luatools-restart-button";
-          } else {
-            restartBtn.className =
-              "btnv6_blue_hoverfade btn_medium luatools-restart-button";
-          }
-          restartBtn.href = "#";
-          const restartText = lt("Restart Steam");
-          restartBtn.title = restartText;
-          restartBtn.setAttribute("data-tooltip-text", restartText);
-          const rspan = document.createElement("span");
-          rspan.textContent = restartText;
-          restartBtn.appendChild(rspan);
-
-          // Normalize margins to match native buttons
-          try {
-            if (referenceBtn) {
-              const cs = window.getComputedStyle(referenceBtn);
-              restartBtn.style.marginLeft = cs.marginLeft;
-              restartBtn.style.marginRight = cs.marginRight;
-            }
-          } catch (_) {}
-
-          restartBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            try {
-              // Ensure any settings overlays are closed before confirm
-              closeSettingsOverlay();
-              askRestartConfirmation();
-            } catch (_) {
-              askRestartConfirmation();
-            }
-          });
-
-          if (referenceBtn && referenceBtn.parentElement) {
-            referenceBtn.after(restartBtn);
-          } else {
-            steamdbContainer.appendChild(restartBtn);
-          }
-          window.__LuaToolsRestartInserted = true;
-          backendLog("Inserted Restart Steam button");
-        }
-      } catch (_) {}
+      // try {
+      //   if (
+      //     !document.querySelector(".luatools-restart-button") &&
+      //     !window.__LuaToolsRestartInserted
+      //   ) {
+      //     ensureStyles();
+      //     // In Big Picture mode, use queue button as reference; otherwise use first link in container
+      //     const referenceBtn = isBigPicture
+      //       ? document.querySelector("#queueBtnFollow")
+      //       : steamdbContainer.querySelector("a");
+      //
+      //     // Use same custom button for both modes
+      //     const restartBtn = document.createElement("a");
+      //     if (referenceBtn && referenceBtn.className) {
+      //       restartBtn.className =
+      //         referenceBtn.className + " luatools-restart-button";
+      //     } else {
+      //       restartBtn.className =
+      //         "btnv6_blue_hoverfade btn_medium luatools-restart-button";
+      //     }
+      //     restartBtn.href = "#";
+      //     const restartText = lt("Restart Steam");
+      //     restartBtn.title = restartText;
+      //     restartBtn.setAttribute("data-tooltip-text", restartText);
+      //     const rspan = document.createElement("span");
+      //     rspan.textContent = restartText;
+      //     restartBtn.appendChild(rspan);
+      //
+      //     // Normalize margins to match native buttons
+      //     try {
+      //       if (referenceBtn) {
+      //         const cs = window.getComputedStyle(referenceBtn);
+      //         restartBtn.style.marginLeft = cs.marginLeft;
+      //         restartBtn.style.marginRight = cs.marginRight;
+      //       }
+      //     } catch (_) {}
+      //
+      //     restartBtn.addEventListener("click", function (e) {
+      //       e.preventDefault();
+      //       try {
+      //         // Ensure any settings overlays are closed before confirm
+      //         closeSettingsOverlay();
+      //         askRestartConfirmation();
+      //       } catch (_) {
+      //         askRestartConfirmation();
+      //       }
+      //     });
+      //
+      //     if (referenceBtn && referenceBtn.parentElement) {
+      //       referenceBtn.after(restartBtn);
+      //     } else {
+      //       steamdbContainer.appendChild(restartBtn);
+      //     }
+      //     window.__LuaToolsRestartInserted = true;
+      //     backendLog("Inserted Restart Steam button");
+      //   }
+      // } catch (_) {}
 
       // Status Pills Logic
       // Always update translations for existing buttons (even if not a page change)
@@ -6474,7 +6474,7 @@
             "btnv6_blue_hoverfade btn_medium luatools-button";
         }
         const span = document.createElement("span");
-        const addViaText = lt("Add via LuaTools");
+        const addViaText = lt("Add");
         span.textContent = addViaText;
         luatoolsButton.appendChild(span);
         // Tooltip/title
@@ -6489,6 +6489,8 @@
             luatoolsButton.style.marginRight = cs.marginRight;
           }
         } catch (_) {}
+        // Add gap before button
+        luatoolsButton.style.marginLeft = "4px";
 
         // Local click handler suppressed; delegated handler manages actions
         luatoolsButton.addEventListener("click", function (e) {
