@@ -23,11 +23,20 @@ function steam_utils.has_lua_for_app(appid)
     local base_path = steam_utils.detect_steam_install_path()
     if not base_path or base_path == "" then return false end
 
-    local stplug_path = fs.join(base_path, "config", "stplug-in")
-    local lua_file = fs.join(stplug_path, tostring(appid) .. ".lua")
-    local disabled_file = fs.join(stplug_path, tostring(appid) .. ".lua.disabled")
+    local dirs_to_check = {
+        fs.join(base_path, "config", "stplug-in"),
+        fs.join(base_path, "config", "lua")
+    }
 
-    return fs.exists(lua_file) or fs.exists(disabled_file)
+    for _, d in ipairs(dirs_to_check) do
+        local lua_file = fs.join(d, tostring(appid) .. ".lua")
+        local disabled_file = fs.join(d, tostring(appid) .. ".lua.disabled")
+        if fs.exists(lua_file) or fs.exists(disabled_file) then
+            return true
+        end
+    end
+
+    return false
 end
 
 function steam_utils.get_game_install_path_response(appid)

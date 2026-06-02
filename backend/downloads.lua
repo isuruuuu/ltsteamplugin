@@ -70,13 +70,18 @@ end
 function downloads._finalize_install_lua(appid, extract_dir, dest_path, api_name)
     _set_download_state(appid, { status = "processing" })
     local base_path = steam_utils.detect_steam_install_path()
-    local target_dir = fs.join(base_path, "config", "stplug-in")
-    if not fs.exists(target_dir) then fs.create_directories(target_dir) end
+    local target_dirs = {
+        fs.join(base_path, "config", "stplug-in"),
+        fs.join(base_path, "config", "lua")
+    }
+    for _, td in ipairs(target_dirs) do
+        if not fs.exists(td) then fs.create_directories(td) end
+    end
     
     local depot_cache = fs.join(base_path, "depotcache")
     if not fs.exists(depot_cache) then fs.create_directories(depot_cache) end
     
-    local target_lua = fs.join(target_dir, tostring(appid) .. ".lua")
+    local target_lua = fs.join(target_dirs[1], tostring(appid) .. ".lua")
     local extracted_lua_path = nil
     
     local success_list, files = pcall(fs.list_recursive, extract_dir)
@@ -97,7 +102,7 @@ function downloads._finalize_install_lua(appid, extract_dir, dest_path, api_name
         end
     end
     
-    if extracted_lua_path and fs.exists(extracted_lua_path) then
+            if extracted_lua_path and fs.exists(extracted_lua_path) then
         local text = m_utils.read_file(extracted_lua_path)
         if text then
             local new_lines = {}
@@ -109,8 +114,16 @@ function downloads._finalize_install_lua(appid, extract_dir, dest_path, api_name
             end
             if new_lines[#new_lines] == "" then table.remove(new_lines) end
             text = table.concat(new_lines, "\n")
-            m_utils.write_file(target_lua, text)
-            _set_download_state(appid, { installedPath = target_lua })
+
+            -- Write the resulting .lua to both target directories (stplug-in and lua)
+            local written_paths = {}
+            for _, td in ipairs(target_dirs) do
+                local p = fs.join(td, tostring(appid) .. ".lua")
+                m_utils.write_file(p, text)
+                table.insert(written_paths, p)
+            end
+
+            _set_download_state(appid, { installedPath = written_paths[1], installedPaths = written_paths })
         end
     end
     

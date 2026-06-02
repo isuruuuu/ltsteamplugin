@@ -377,11 +377,15 @@ end
 function DeleteLuaToolsForApp(appid)
     if type(appid) == "table" then appid = appid.appid end
     local base = steam_utils.detect_steam_install_path()
-    local target_dir = fs.join(base, "config", "stplug-in")
-    local candidates = {
-        fs.join(target_dir, tostring(appid) .. ".lua"),
-        fs.join(target_dir, tostring(appid) .. ".lua.disabled"),
+    local dirs = {
+        fs.join(base, "config", "stplug-in"),
+        fs.join(base, "config", "lua")
     }
+    local candidates = {}
+    for _, d in ipairs(dirs) do
+        table.insert(candidates, fs.join(d, tostring(appid) .. ".lua"))
+        table.insert(candidates, fs.join(d, tostring(appid) .. ".lua.disabled"))
+    end
     local deleted = {}
     for _, p in ipairs(candidates) do
         if fs.exists(p) then
@@ -451,23 +455,32 @@ end
 function GetInstalledLuaScripts()
     local ok, res = pcall(function()
         local base = steam_utils.detect_steam_install_path()
-        local target_dir = fs.join(base, "config", "stplug-in")
+        local dirs = {
+            fs.join(base, "config", "stplug-in"),
+            fs.join(base, "config", "lua")
+        }
         local scripts = {}
-        local ok2, files = pcall(fs.list, target_dir)
-        if ok2 and files then
-            for _, entry in ipairs(files) do
-                local name = entry.name or ""
-                if name:match("%.lua$") or name:match("%.lua%.disabled$") then
-                    local aid = name:match("^(%d+)%.")
-                    if aid then
-                        table.insert(scripts, {
-                            appid      = tonumber(aid),
-                            gameName   = "Unknown Game (" .. aid .. ")",
-                            filename   = name,
-                            isDisabled = name:match("%.disabled$") ~= nil,
-                            path       = entry.path or ""
-                        })
+        local seen = {}
+        for _, target_dir in ipairs(dirs) do
+            local ok2, files = pcall(fs.list, target_dir)
+            if ok2 and files then
+                for _, entry in ipairs(files) do
+                    local name = entry.name or ""
+                    if name:match("%.lua$") or name:match("%.lua%.disabled$") then
+                        if seen[name] then goto continue end
+                        seen[name] = true
+                        local aid = name:match("^(%d+)%.")
+                        if aid then
+                            table.insert(scripts, {
+                                appid      = tonumber(aid),
+                                gameName   = "Unknown Game (" .. aid .. ")",
+                                filename   = name,
+                                isDisabled = name:match("%.disabled$") ~= nil,
+                                path       = entry.path or ""
+                            })
+                        end
                     end
+                    ::continue::
                 end
             end
         end
