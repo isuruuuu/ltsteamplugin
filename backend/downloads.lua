@@ -141,10 +141,9 @@ local function _launch_async_download(appid, url, dest_path, extract_dir)
     if not fs.exists(extract_dir) then fs.create_directories(extract_dir) end
     
     if is_windows then
-        local ps1_path = fs.join(paths.get_plugin_dir(), "backend", "scripts", "downloader.ps1")
         local cmd = string.format(
-            'powershell -WindowStyle Hidden -Command "Start-Process -FilePath powershell -WindowStyle Hidden -ArgumentList \'-ExecutionPolicy Bypass -File \\"%s\\" -Url \\"%s\\" -DestPath \\"%s\\" -ExtractDir \\"%s\\" -StateFile \\"%s\\"\'"',
-            ps1_path, url, dest_path, extract_dir, state_file
+            'cmd.exe /C start "LuaTools Downloader" cmd.exe /C "color 0B && echo LuaTools is downloading the requested files... && echo Please keep this window open until it closes automatically. && echo. && (echo {"status": "downloading"} > "%s" && curl.exe -# -L -A "discord(dot)gg/luatools" "%s" -o "%s" && echo {"status": "extracting"} > "%s" && echo. && echo Extracting files... && tar.exe -xf "%s" -C "%s" && echo {"status": "extracted"} > "%s") || (echo. && echo ERROR: Download or extraction failed! && echo {"status": "failed"} > "%s" && timeout /t 5)"',
+            state_file, url, dest_path, state_file, dest_path, extract_dir, state_file, state_file
         )
         m_utils.exec(cmd)
     else
